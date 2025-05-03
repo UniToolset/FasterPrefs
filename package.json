@@ -1,0 +1,11 @@
+﻿{
+  "name": "com.unitoolset.fasterprefs",
+  "displayName": "FasterPrefs",
+  "author": { "name": "Oleksii Potapov", "url": "https://github.com/UniToolset/FasterPrefs" },
+  "version": "1.0.0",
+  "unity": "2018.4",
+  "description": "Provides a faster PlayerPrefs that does not occupy main CPU thread.",
+  "keywords": [ "PlayerPrefs" ],
+  "license": "LGPL-3.0-or-later",
+  "dependencies": {}
+}
