@@ -80,13 +80,13 @@ namespace FasterPrefs
             });
         }
         
-        internal void DeleteKey(string key)
+        internal void DeleteKey(string key, DataType type)
         {
-            _allEntries.RemoveAll(e => e.Key == key);
+            _allEntries.RemoveAll(e => e.Key == key && e.DataType == type);
             _cache.Enqueue(new Entry()
             {
                 Key = key,
-                DataType = DataType.String,
+                DataType = type,
                 Value = null
             });
         }
@@ -163,7 +163,8 @@ namespace FasterPrefs
         {
             String,
             Int,
-            Float
+            Float,
+            Bool
         }
 
         internal class Entry

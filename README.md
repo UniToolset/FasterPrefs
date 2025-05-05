@@ -6,7 +6,7 @@ FasterPrefs is a high-performance alternative to Unity's PlayerPrefs that operat
 - Fast in-memory access
 - Automatic background saving
 - Type-safe API
-- Support for string, int, and float values
+- Support for string, int, bool and float values
 - Supports different type values for the same key
 
 ## Installation

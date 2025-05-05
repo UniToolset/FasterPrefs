@@ -6,7 +6,7 @@ namespace FasterPrefs
 {
     /// <summary>
     /// Provides an optimized alternative to Unity's PlayerPrefs for storing key-value pairs persistently.
-    /// Supports string, int, and float data types with improved performance through in-memory dictionaries.
+    /// Supports string, int, bool and float data types with improved performance through in-memory dictionaries.
     /// It Does not require a Save method as a separate thread worker picks up the changes and writes them to the disk.
     /// </summary>
     public class FasterPrefs
@@ -14,6 +14,7 @@ namespace FasterPrefs
         private readonly Dictionary<string, string> _stringValues = new();
         private readonly Dictionary<string, int> _intValues = new();
         private readonly Dictionary<string, float> _floatValues = new();
+        private readonly Dictionary<string, bool> _boolValues = new();
         private readonly Storage _storage;
 
         /// <summary>
@@ -37,6 +38,9 @@ namespace FasterPrefs
                         break;
                     case Storage.DataType.Float:
                         _floatValues[entry.Key] = float.Parse(entry.Value, CultureInfo.InvariantCulture);
+                        break;
+                    case Storage.DataType.Bool:
+                        _boolValues[entry.Key] = int.Parse(entry.Value) == 1;
                         break;
                 }
             }
@@ -112,9 +116,32 @@ namespace FasterPrefs
         }
 
         /// <summary>
+        /// Stores a bool value associated with the specified key.
+        /// </summary>
+        /// <param name="key">The key to identify the value.</param>
+        /// <param name="value">The bool value to store.</param>
+        public void SetValue(string key, bool value)
+        {
+            _boolValues[key] = value;
+            _storage.SetValue(key, Storage.DataType.Bool, value ? 1 : 0);
+        }
+
+        /// <summary>
+        /// Retrieves a stored float value by its key.
+        /// </summary>
+        /// <param name="key">The key of the value to retrieve.</param>
+        /// <param name="defaultValue">The value to return if the key doesn't exist.</param>
+        /// <returns>The stored float value or the default value if the key is not found.</returns>
+        public bool GetBool(string key, bool defaultValue = false)
+        {
+            if (!_boolValues.ContainsKey(key)) return defaultValue;
+            return _boolValues[key];
+        }
+
+        /// <summary>
         /// Deletes a key-value pair of the specified type.
         /// </summary>
-        /// <typeparam name="T">The type of value (string, int, or float).</typeparam>
+        /// <typeparam name="T">The type of value (string, int, bool or float).</typeparam>
         /// <param name="key">The key to delete.</param>
         /// <exception cref="ArgumentException">Thrown when T is not a supported type.</exception>
         public void DeleteKey<T>(string key)
@@ -122,18 +149,28 @@ namespace FasterPrefs
             if (typeof(T) == typeof(string))
             {
                 _stringValues.Remove(key);
+                _storage.DeleteKey(key, Storage.DataType.String);
                 return;
             }
 
             if (typeof(T) == typeof(int))
             {
                 _intValues.Remove(key);
+                _storage.DeleteKey(key, Storage.DataType.Int);
                 return;
             }
 
             if (typeof(T) == typeof(float))
             {
                 _floatValues.Remove(key);
+                _storage.DeleteKey(key, Storage.DataType.Float);
+                return;
+            }
+
+            if (typeof(T) == typeof(bool))
+            {
+                _boolValues.Remove(key);
+                _storage.DeleteKey(key, Storage.DataType.Bool);
                 return;
             }
             
@@ -143,7 +180,7 @@ namespace FasterPrefs
         /// <summary>
         /// Checks if a key exists for the specified type.
         /// </summary>
-        /// <typeparam name="T">The type of value (string, int, or float).</typeparam>
+        /// <typeparam name="T">The type of value (string, int, bool or float).</typeparam>
         /// <param name="key">The key to check.</param>
         /// <returns>True if the key exists, false otherwise.</returns>
         /// <exception cref="ArgumentException">Thrown when T is not a supported type.</exception>
@@ -155,6 +192,8 @@ namespace FasterPrefs
                return _intValues.ContainsKey(key);
            if (typeof(T) == typeof(float))
                return _floatValues.ContainsKey(key);
+           if (typeof(T) == typeof(bool))
+               return _boolValues.ContainsKey(key);
            
            throw new ArgumentException($"Unsupported type: {typeof(T).Name}");
        }
@@ -167,6 +206,7 @@ namespace FasterPrefs
             _stringValues.Clear();
             _intValues.Clear();
             _floatValues.Clear();
+            _boolValues.Clear();
             _storage.DeleteAll();
         }
     }
