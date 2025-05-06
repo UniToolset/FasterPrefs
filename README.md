@@ -1,6 +1,14 @@
 # FasterPrefs
 FasterPrefs is a high-performance alternative to Unity's PlayerPrefs that operates off the main thread. It provides a way to store and retrieve key-value pairs and saving it to file automatically without blocking the main game loop.
 
+Comperison with Unity's PlayerPrefs (1000 operations, different values):
+
+| Feature                | Unity PlayerPrefs | FasterPrefs         |
+|------------------------|-------------------|---------------------|
+| Set string value       | 273000 ticks      | 5619 ticks          |
+| Has key                | 328000 ticks      | 5935 ticks          |
+| Get string value       | 164899 ticks      | 4393 ticks          |
+
 ## Features
 - Non-blocking operations (doesn't freeze the main thread)
 - Fast in-memory access
